@@ -55,41 +55,9 @@ https://flight-management-app-five.vercel.app/
 
 ---
 
-# Screenshots
-
-## Home Page
-
-![Home Page](./README-assets/home-page.png)
-
----
-
-## Flight Results
-
-![Flight Results](./README-assets/flights-page.png)
-
----
-
-## Seat Selection
-
-![Seat Selection](./README-assets/seat-map.png)
-
----
-
-## Booking Confirmation
-
-![Booking Confirmation](./README-assets/booking-confirmation.png)
-
----
-
-## My Bookings
-
-![My Bookings](./README-assets/my-bookings.png)
-
----
-
 # Lighthouse Report
 
-![Lighthouse Report](./README-assets/lighthouse-report.png)
+![Lighthouse Report](./readme-assets/lighthouse-image.png)
 
 | Category | Score |
 |----------|-------|
