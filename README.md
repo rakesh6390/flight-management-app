@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Flight Management App
+
+Next.js flight booking app with Supabase auth, seat selection, bookings, reschedule/cancel flows, and **Progressive Web App (PWA)** support.
 
 ## Getting Started
 
-First, run the development server:
-
 ```bash
+npm install
+cp .env.example .env.local   # add Supabase URL + anon key
+npx supabase db push         # apply migrations
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Production build (required for PWA)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+PWA uses Workbox via `@ducanh2912/next-pwa` and **must be built with Webpack**:
 
-## Learn More
+```bash
+npm run build    # runs prebuild (icons) + next build --webpack
+npm run start
+```
 
-To learn more about Next.js, take a look at the following resources:
+Service worker is **disabled in development**; test install/offline with a production build.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+---
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## PWA (Task 05)
 
-## Deploy on Vercel
+### Features
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Feature | Implementation |
+|--------|----------------|
+| **Installable** | `public/manifest.json` — name, 192/512 icons, `#0284c7` theme, `display: standalone` |
+| **Service worker** | `@ducanh2912/next-pwa` → `public/sw.js` on build |
+| **Flight search cache** | `StaleWhileRevalidate` for `/flights` navigations |
+| **Static assets** | `CacheFirst` for `/_next/static/*` and file extensions (js, css, fonts, images) |
+| **Offline fallback** | `/offline` when document fetch fails |
+| **My Bookings offline** | `localStorage` cache + `NetworkFirst` page cache; read-only when offline |
+| **Install banner** | Mobile-first `beforeinstallprompt` banner (dismiss stored in `localStorage`) |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Test offline
+
+1. `npm run build && npm run start`
+2. Sign in, open **My bookings** (loads live data → cached locally).
+3. DevTools → **Application** → Service Workers → verify `sw.js`.
+4. DevTools → **Network** → **Offline** → reload `/my-bookings` (cached list) or visit `/flights` (stale search if previously loaded).
+
+### Lighthouse PWA audit (target ≥ 90)
+
+1. Run production server: `npm run start`
+2. Chrome → `http://localhost:3000` → DevTools → **Lighthouse**
+3. Mode: **Navigation**, Device: **Mobile**, Categories: **Progressive Web App** (and Performance if desired)
+4. Run on `/` and `/my-bookings` (authenticated) for best scores.
+
+**Checklist for a high PWA score:**
+
+- [x] Web app manifest with required fields
+- [x] Service worker registered
+- [x] HTTPS (or `localhost`)
+- [x] 192px and 512px icons
+- [x] `theme-color` / `display: standalone`
+- [x] Offline fallback page
+
+#### Lighthouse PWA score (add your screenshot)
+
+After running the audit, save a screenshot as `docs/lighthouse-pwa.png` and embed it here:
+
+```markdown
+![Lighthouse PWA audit](./docs/lighthouse-pwa.png)
+```
+
+_Example placeholder — replace with your run:_
+
+| Category | Score |
+|----------|-------|
+| PWA      | _Run Lighthouse and paste score_ |
+
+### Regenerate icons
+
+```bash
+npm run pwa:icons
+```
+
+Outputs `public/icons/icon-192.png` and `public/icons/icon-512.png`.
+
+---
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Development server |
+| `npm run build` | Production build (Webpack + PWA) |
+| `npm run start` | Production server |
+| `npm run pwa:icons` | Generate PWA PNG icons |
+
+## Stack
+
+- Next.js App Router, TypeScript, Tailwind CSS
+- Supabase (auth, Postgres, RLS, RPC)
+- Zustand, sonner, Zod
+- `@ducanh2912/next-pwa` (Workbox)
