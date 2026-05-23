@@ -1,109 +1,320 @@
 # Flight Management App
 
-Next.js flight booking app with Supabase auth, seat selection, bookings, reschedule/cancel flows, and **Progressive Web App (PWA)** support.
+A full-stack flight booking and management platform built with Next.js 14 and Supabase.
 
-## Getting Started
-
-```bash
-npm install
-cp .env.example .env.local   # add Supabase URL + anon key
-npx supabase db push         # apply migrations
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-## Production build (required for PWA)
-
-PWA uses Workbox via `@ducanh2912/next-pwa` and **must be built with Webpack**:
-
-```bash
-npm run build    # runs prebuild (icons) + next build --webpack
-npm run start
-```
-
-Service worker is **disabled in development**; test install/offline with a production build.
+Features include:
+- Authentication with Supabase
+- Flight search and filtering
+- Aircraft seat selection
+- Realtime seat updates
+- Booking management
+- Cancellation and rescheduling
+- Progressive Web App (PWA) support
+- Responsive mobile-first UI
 
 ---
 
-## PWA (Task 05)
+## Live Demo
 
-### Features
+https://flight-management-app-five.vercel.app/
 
-| Feature | Implementation |
-|--------|----------------|
-| **Installable** | `public/manifest.json` — name, 192/512 icons, `#0284c7` theme, `display: standalone` |
-| **Service worker** | `@ducanh2912/next-pwa` → `public/sw.js` on build |
-| **Flight search cache** | `StaleWhileRevalidate` for `/flights` navigations |
-| **Static assets** | `CacheFirst` for `/_next/static/*` and file extensions (js, css, fonts, images) |
-| **Offline fallback** | `/offline` when document fetch fails |
-| **My Bookings offline** | `localStorage` cache + `NetworkFirst` page cache; read-only when offline |
-| **Install banner** | Mobile-first `beforeinstallprompt` banner (dismiss stored in `localStorage`) |
+---
 
-### Test offline
+## Features
 
-1. `npm run build && npm run start`
-2. Sign in, open **My bookings** (loads live data → cached locally).
-3. DevTools → **Application** → Service Workers → verify `sw.js`.
-4. DevTools → **Network** → **Offline** → reload `/my-bookings` (cached list) or visit `/flights` (stale search if previously loaded).
+- JWT authentication with Supabase Auth
+- Protected routes using Next.js middleware
+- Realtime seat synchronization using Supabase Realtime
+- Responsive aircraft seat map
+- Booking and cancellation flows
+- Transactional reschedule logic
+- Zustand persisted state management
+- Offline PWA support
+- Mobile responsive UI
+- Loading skeletons and toast notifications
+- Role-based protected booking flows
 
-### Lighthouse PWA audit (target ≥ 90)
+---
 
-1. Run production server: `npm run start`
-2. Chrome → `http://localhost:3000` → DevTools → **Lighthouse**
-3. Mode: **Navigation**, Device: **Mobile**, Categories: **Progressive Web App** (and Performance if desired)
-4. Run on `/` and `/my-bookings` (authenticated) for best scores.
+## Tech Stack
 
-**Checklist for a high PWA score:**
+- Next.js 14 App Router
+- TypeScript
+- Tailwind CSS
+- Supabase
+  - PostgreSQL
+  - Authentication
+  - Realtime
+  - Row Level Security (RLS)
+  - RPC functions
+- Zustand
+- react-hook-form
+- Zod
+- sonner
+- @ducanh2912/next-pwa
 
-- [x] Web app manifest with required fields
-- [x] Service worker registered
-- [x] HTTPS (or `localhost`)
-- [x] 192px and 512px icons
-- [x] `theme-color` / `display: standalone`
-- [x] Offline fallback page
+---
 
-#### Lighthouse PWA score (add your screenshot)
+# Screenshots
 
-After running the audit, save a screenshot as `docs/lighthouse-pwa.png` and embed it here:
+## Home Page
 
-```markdown
-![Lighthouse PWA audit](./docs/lighthouse-pwa.png)
-```
+![Home Page](./README-assets/home-page.png)
 
-_Example placeholder — replace with your run:_
+---
+
+## Flight Results
+
+![Flight Results](./README-assets/flights-page.png)
+
+---
+
+## Seat Selection
+
+![Seat Selection](./README-assets/seat-map.png)
+
+---
+
+## Booking Confirmation
+
+![Booking Confirmation](./README-assets/booking-confirmation.png)
+
+---
+
+## My Bookings
+
+![My Bookings](./README-assets/my-bookings.png)
+
+---
+
+# Lighthouse Report
+
+![Lighthouse Report](./README-assets/lighthouse-report.png)
 
 | Category | Score |
 |----------|-------|
-| PWA      | _Run Lighthouse and paste score_ |
-
-### Regenerate icons
-
-```bash
-npm run pwa:icons
-```
-
-Outputs `public/icons/icon-192.png` and `public/icons/icon-512.png`.
+| Performance | 87 |
+| Accessibility | 86 |
+| Best Practices | 100 |
+| SEO | 100 |
 
 ---
 
-## Scripts
+## Getting Started
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/rakesh6390/flight-management-app.git
+cd flight-management-app
+```
+
+---
+
+### 2. Install Dependencies
+
+```bash
+npm install
+```
+
+---
+
+### 3. Create Environment Variables
+
+Create:
+
+```bash
+.env.local
+```
+
+Add:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+---
+
+### 4. Apply Supabase Migrations
+
+```bash
+npx supabase db push
+```
+
+---
+
+### 5. Run Development Server
+
+```bash
+npm run dev
+```
+
+Open:
+
+```txt
+http://localhost:3000
+```
+
+---
+
+# Production Build (Required for PWA)
+
+PWA uses Workbox via `@ducanh2912/next-pwa`.
+
+```bash
+npm run build
+npm run start
+```
+
+Service worker is disabled in development.
+
+---
+
+# PWA Features
+
+| Feature | Implementation |
+|--------|----------------|
+| Installable | manifest.json + app icons |
+| Service worker | @ducanh2912/next-pwa |
+| Flight search cache | StaleWhileRevalidate |
+| Static asset caching | CacheFirst |
+| Offline fallback | /offline |
+| Cached bookings | localStorage + NetworkFirst |
+| Install banner | beforeinstallprompt |
+
+---
+
+# Offline Testing
+
+1. Run production build:
+
+```bash
+npm run build
+npm run start
+```
+
+2. Open app and login.
+
+3. Visit:
+- `/my-bookings`
+- `/flights`
+
+4. Open Chrome DevTools:
+- Application → Service Workers
+- Verify `sw.js`
+
+5. Open:
+- DevTools → Network → Offline
+
+6. Reload pages to test offline behavior.
+
+---
+
+# Folder Structure
+
+```txt
+app/
+components/
+hooks/
+lib/
+stores/
+types/
+actions/
+public/
+supabase/
+```
+
+---
+
+# Important Features
+
+## Authentication
+
+- Supabase email authentication
+- Protected routes
+- Session middleware
+- Auth redirects
+
+---
+
+## Flight Search
+
+- Origin/destination filtering
+- Date filtering
+- Passenger count support
+- URL query synchronization
+
+---
+
+## Seat Selection
+
+- Economy/business/first-class seat maps
+- Occupied/available seat states
+- Responsive aircraft layout
+- Realtime updates
+
+---
+
+## Booking Flow
+
+- Passenger validation
+- Seat reservation RPC
+- Booking confirmation
+- PNR generation
+
+---
+
+## Reschedule & Cancellation
+
+- Transaction-safe booking updates
+- Cancellation RPC
+- Seat release logic
+- Reschedule tracking
+
+---
+
+# Scripts
 
 | Command | Description |
 |---------|-------------|
-| `npm run dev` | Development server |
-| `npm run build` | Production build (Webpack + PWA) |
-| `npm run start` | Production server |
-| `npm run pwa:icons` | Generate PWA PNG icons |
+| npm run dev | Development server |
+| npm run build | Production build |
+| npm run start | Production server |
+| npm run pwa:icons | Generate PWA icons |
 
-## Stack
+---
 
-- Next.js App Router, TypeScript, Tailwind CSS
-- Supabase (auth, Postgres, RLS, RPC)
-- Zustand, sonner, Zod
-- `@ducanh2912/next-pwa` (Workbox)
+# Deployment
 
+Frontend deployed on:
+- Vercel
 
-## Lighthouse Report
+Backend services:
+- Supabase
 
-![Lighthouse Report](./README-assets/lighthouse-report.png)
+---
+
+# Environment Variables
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```
+
+---
+
+# Future Improvements
+
+- Payment gateway integration
+- Email ticket generation
+- QR boarding passes
+- Admin dashboard
+- Flight analytics
+- Multi-passenger bookings
+
+---
+
+# Author
+
+Built by Rakesh Chauhan.
