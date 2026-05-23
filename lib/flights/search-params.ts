@@ -37,10 +37,16 @@ export function buildFlightsSearchUrl(
 export function parseFlightSearchParams(
   raw: RawFlightSearchParams
 ): { success: true; data: FlightSearchInput } | { success: false; error: string } {
-  const origin = getParam(raw, FLIGHT_SEARCH_PARAM_KEYS.origin);
-  const destination = getParam(raw, FLIGHT_SEARCH_PARAM_KEYS.destination);
-  const departureDate = getParam(raw, FLIGHT_SEARCH_PARAM_KEYS.departureDate);
-  const passengers = getParam(raw, FLIGHT_SEARCH_PARAM_KEYS.passengers);
+  const origin = getParam(raw, FLIGHT_SEARCH_PARAM_KEYS.origin)?.trim();
+  const destination = getParam(
+    raw,
+    FLIGHT_SEARCH_PARAM_KEYS.destination
+  )?.trim();
+  const departureDate = getParam(
+    raw,
+    FLIGHT_SEARCH_PARAM_KEYS.departureDate
+  )?.trim();
+  const passengers = getParam(raw, FLIGHT_SEARCH_PARAM_KEYS.passengers)?.trim();
 
   if (!origin && !destination && !departureDate) {
     return { success: false, error: "missing_params" };
