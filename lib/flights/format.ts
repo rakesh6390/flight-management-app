@@ -1,6 +1,12 @@
 import { differenceInMinutes, format, parseISO } from "date-fns";
 
+import { formatDepartureDateForDisplay } from "@/lib/flights/dates";
 import type { CabinClass } from "@/types/database";
+
+/** Display-only: DD-MM-YYYY from internal YYYY-MM-DD search date */
+export function formatSearchDepartureDate(isoDateKey: string): string {
+  return formatDepartureDateForDisplay(isoDateKey);
+}
 
 export function formatAirportCode(code: string): string {
   return code.toUpperCase();

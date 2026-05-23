@@ -9,6 +9,7 @@ export type SeatSnapshot = Tables<"seats">;
 export interface SearchQuery {
   origin: string;
   destination: string;
+  /** Always YYYY-MM-DD (ISO date key) — never DD-MM-YYYY */
   departureDate: string;
   passengerCount: number;
 }

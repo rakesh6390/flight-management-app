@@ -11,6 +11,7 @@ import type {
   SearchQuery,
   SeatSnapshot,
 } from "@/types/flight-store";
+import { normalizeDepartureDate } from "@/lib/flights/dates";
 import {
   createEmptyPassenger,
   createPassengerForms,
@@ -20,7 +21,7 @@ import {
 } from "@/types/flight-store";
 
 const STORAGE_KEY = "flight-management-store";
-const STORAGE_VERSION = 1;
+const STORAGE_VERSION = 2;
 
 const initialBookingState: Pick<
   FlightStoreState,
@@ -75,6 +76,11 @@ export const useFlightStore = create<FlightStore>()(
           const searchQuery: SearchQuery = {
             ...state.searchQuery,
             ...query,
+            ...(query.departureDate !== undefined
+              ? {
+                  departureDate: normalizeDepartureDate(query.departureDate),
+                }
+              : {}),
           };
 
           return {
@@ -229,13 +235,25 @@ export const useFlightStore = create<FlightStore>()(
           current.passengerFormData
         );
 
+        const searchQuery = persistedState.searchQuery
+          ? {
+              ...current.searchQuery,
+              ...persistedState.searchQuery,
+              departureDate: persistedState.searchQuery.departureDate
+                ? normalizeDepartureDate(
+                    persistedState.searchQuery.departureDate
+                  )
+                : current.searchQuery.departureDate,
+            }
+          : current.searchQuery;
+
         return {
           ...current,
           ...persistedState,
+          searchQuery,
           passengerFormData: syncPassengersToCount(
             passengerFormData,
-            persistedState.searchQuery?.passengerCount ??
-              current.searchQuery.passengerCount
+            searchQuery.passengerCount
           ),
         };
       },

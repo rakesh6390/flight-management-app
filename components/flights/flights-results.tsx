@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import { FlightCard } from "@/components/flights/flight-card";
 import { EmptyState } from "@/components/flights/empty-state";
+import { formatSearchDepartureDate } from "@/lib/flights/format";
 import type { FlightSearchInput } from "@/lib/validations/search";
 import type { FlightWithAvailability } from "@/types/flights";
 
@@ -15,7 +16,7 @@ export function FlightsResults({ flights, search }: FlightsResultsProps) {
     return (
       <EmptyState
         title="No flights found"
-        description={`We couldn't find flights from ${search.origin} to ${search.destination} on ${search.departureDate}. Try different dates or airports.`}
+        description={`We couldn't find flights from ${search.origin} to ${search.destination} on ${formatSearchDepartureDate(search.departureDate)}. Try different dates or airports.`}
         icon="flight"
         action={
           <Link

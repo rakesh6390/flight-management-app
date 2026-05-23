@@ -1,3 +1,4 @@
+import { normalizeDepartureDate } from "@/lib/flights/dates";
 import type { FlightSearchInput } from "@/lib/validations/search";
 import { flightSearchSchema } from "@/lib/validations/search";
 import type { SearchQuery } from "@/types/flight-store";
@@ -18,9 +19,15 @@ export function searchQueryToParams(
   query: SearchQuery | FlightSearchInput
 ): URLSearchParams {
   const params = new URLSearchParams();
-  params.set(FLIGHT_SEARCH_PARAM_KEYS.origin, query.origin);
-  params.set(FLIGHT_SEARCH_PARAM_KEYS.destination, query.destination);
-  params.set(FLIGHT_SEARCH_PARAM_KEYS.departureDate, query.departureDate);
+  params.set(FLIGHT_SEARCH_PARAM_KEYS.origin, query.origin.trim().toUpperCase());
+  params.set(
+    FLIGHT_SEARCH_PARAM_KEYS.destination,
+    query.destination.trim().toUpperCase()
+  );
+  params.set(
+    FLIGHT_SEARCH_PARAM_KEYS.departureDate,
+    normalizeDepartureDate(query.departureDate)
+  );
   params.set(
     FLIGHT_SEARCH_PARAM_KEYS.passengers,
     String(query.passengerCount)
@@ -75,7 +82,7 @@ export function flightSearchInputToSearchQuery(
   return {
     origin: input.origin,
     destination: input.destination,
-    departureDate: input.departureDate,
+    departureDate: normalizeDepartureDate(input.departureDate),
     passengerCount: input.passengerCount,
   };
 }

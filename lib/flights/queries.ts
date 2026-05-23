@@ -2,10 +2,10 @@ import { addDays, parseISO } from "date-fns";
 
 import { createClient } from "@/lib/supabase/server";
 import {
-  getDepartureDateKey,
+  getDepartureDateKeyFromTimestamp,
   matchesDepartureDate,
   normalizeFlightSearchFilters,
-} from "@/lib/flights/search-filter";
+} from "@/lib/flights/dates";
 import type { CabinClass } from "@/types/database";
 import type {
   FetchFlightsResult,
@@ -95,14 +95,15 @@ export async function fetchFlightsBySearch(
   const normalized = normalizeFlightSearchFilters(filters);
   const { origin, destination, departureDate } = normalized;
 
-  debugFlightSearch("search values", {
-    raw: filters,
-    normalized,
+  debugFlightSearch("search date (YYYY-MM-DD)", {
+    rawDepartureDate: filters.departureDate,
+    normalizedSearchDate: departureDate,
+    origin,
+    destination,
   });
 
   const supabase = await createClient();
 
-  // Loose window for the DB query; final match uses calendar date only.
   const windowAnchor = parseISO(`${departureDate}T12:00:00.000Z`);
   const windowStart = addDays(windowAnchor, -1).toISOString();
   const windowEnd = addDays(windowAnchor, 2).toISOString();
@@ -141,15 +142,11 @@ export async function fetchFlightsBySearch(
   const fetched = (data as FlightWithSeats[] | null) ?? [];
 
   debugFlightSearch(
-    "fetched flights (before date filter)",
+    "database dates (departs_at → date key)",
     fetched.map((row) => ({
-      id: row.id,
       flight_no: row.flight_no,
-      origin: row.origin,
-      destination: row.destination,
       departs_at: row.departs_at,
-      departureDateKey: getDepartureDateKey(row.departs_at),
-      status: row.status,
+      databaseDateKey: getDepartureDateKeyFromTimestamp(row.departs_at),
     }))
   );
 
@@ -160,10 +157,10 @@ export async function fetchFlightsBySearch(
   debugFlightSearch(
     "filtered results",
     filtered.map((row) => ({
-      id: row.id,
       flight_no: row.flight_no,
       departs_at: row.departs_at,
-      departureDateKey: getDepartureDateKey(row.departs_at),
+      databaseDateKey: getDepartureDateKeyFromTimestamp(row.departs_at),
+      matchesSearchDate: departureDate,
     }))
   );
 

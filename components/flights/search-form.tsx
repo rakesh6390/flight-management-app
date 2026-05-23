@@ -6,6 +6,11 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
+import {
+  formatDepartureDateForDisplay,
+  isValidIsoDateKey,
+  normalizeDepartureDate,
+} from "@/lib/flights/dates";
 import { buildFlightsSearchUrl } from "@/lib/flights/search-params";
 import { cn } from "@/lib/utils";
 import {
@@ -46,8 +51,9 @@ export function SearchForm({
     defaultValues: {
       origin: initialValues?.origin ?? storedQuery.origin,
       destination: initialValues?.destination ?? storedQuery.destination,
-      departureDate:
-        initialValues?.departureDate ?? storedQuery.departureDate,
+      departureDate: normalizeDepartureDate(
+        initialValues?.departureDate ?? storedQuery.departureDate ?? ""
+      ),
       passengerCount:
         initialValues?.passengerCount ?? storedQuery.passengerCount,
     },
@@ -55,17 +61,33 @@ export function SearchForm({
 
   const origin = watch("origin");
   const destination = watch("destination");
+  const departureDateValue = watch("departureDate");
+  const displayDepartureDate =
+    departureDateValue && isValidIsoDateKey(normalizeDepartureDate(departureDateValue))
+      ? formatDepartureDateForDisplay(departureDateValue)
+      : null;
 
   useEffect(() => {
     if (initialValues) {
       reset({
         origin: initialValues.origin ?? "",
         destination: initialValues.destination ?? "",
-        departureDate: initialValues.departureDate ?? "",
+        departureDate: initialValues.departureDate
+          ? normalizeDepartureDate(initialValues.departureDate)
+          : "",
         passengerCount: initialValues.passengerCount ?? 1,
       });
     }
   }, [initialValues, reset]);
+
+  useEffect(() => {
+    if (storedQuery.departureDate && !initialValues?.departureDate) {
+      const iso = normalizeDepartureDate(storedQuery.departureDate);
+      if (iso !== storedQuery.departureDate) {
+        setValue("departureDate", iso, { shouldValidate: false });
+      }
+    }
+  }, [initialValues?.departureDate, setValue, storedQuery.departureDate]);
 
   const swapAirports = () => {
     setValue("origin", destination?.toUpperCase() ?? "", { shouldValidate: true });
@@ -73,16 +95,23 @@ export function SearchForm({
   };
 
   const onSubmit = handleSubmit((data) => {
+    const departureDate = normalizeDepartureDate(data.departureDate);
+
     setSearchQuery({
       origin: data.origin,
       destination: data.destination,
-      departureDate: data.departureDate,
+      departureDate,
       passengerCount: data.passengerCount,
     });
     setBookingStep("select-flight");
 
     if (syncUrlOnSubmit) {
-      router.push(buildFlightsSearchUrl(data));
+      router.push(
+        buildFlightsSearchUrl({
+          ...data,
+          departureDate,
+        })
+      );
     }
   });
 
@@ -158,6 +187,11 @@ export function SearchForm({
             className={inputClass(!!errors.departureDate)}
             aria-invalid={!!errors.departureDate}
           />
+          {displayDepartureDate ? (
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              {displayDepartureDate} (DD-MM-YYYY)
+            </p>
+          ) : null}
         </Field>
 
         <Field

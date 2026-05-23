@@ -9,7 +9,7 @@ import { SearchForm } from "@/components/flights/search-form";
 import { SearchStoreSync } from "@/components/flights/search-store-sync";
 import { SiteHeader } from "@/components/layout/site-header";
 import { fetchFlightsBySearch } from "@/lib/flights/queries";
-import { formatFlightDateTime } from "@/lib/flights/format";
+import { formatSearchDepartureDate } from "@/lib/flights/format";
 import {
   flightSearchInputToSearchQuery,
   hasFlightSearchParams,
@@ -92,7 +92,7 @@ export default async function FlightsPage({ searchParams }: FlightsPageProps) {
           {search.origin} → {search.destination}
         </h1>
         <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-          {formatFlightDateTime(`${search.departureDate}T12:00:00`)} ·{" "}
+          {formatSearchDepartureDate(search.departureDate)} ·{" "}
           {search.passengerCount} passenger
           {search.passengerCount === 1 ? "" : "s"}
         </p>
