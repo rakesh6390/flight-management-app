@@ -102,3 +102,8 @@ Outputs `public/icons/icon-192.png` and `public/icons/icon-512.png`.
 - Supabase (auth, Postgres, RLS, RPC)
 - Zustand, sonner, Zod
 - `@ducanh2912/next-pwa` (Workbox)
+
+
+## Lighthouse Report
+
+![Lighthouse Report](./README-assets/lighthouse-report.png)
